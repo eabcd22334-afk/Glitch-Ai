@@ -673,7 +673,7 @@ button {
 </div>
 
 <script>
-const workerUrl = 'https://nyx-ai-core.eabcd22334.workers.dev';
+const workerUrl = 'https://nyx-ai-core.eabcd22334.workers.dev/chat';
 
 const body = document.body;
 const chatBox = document.getElementById('chat-box');
@@ -683,6 +683,7 @@ const sendBtn = document.getElementById('send-btn');
 const themeBtn = document.getElementById('theme-toggle');
 
 let isSending = false;
+let conversation = [];
 
 /* THEME */
 
@@ -691,7 +692,9 @@ function applyTheme(theme) {
     themeBtn.textContent = theme === 'light' ? '☾' : '☀';
 
     document.querySelector('meta[name="theme-color"]')
-        .setAttribute('content', theme === 'light' ? '#ffffff' : '#101010');
+        .setAttribute('content',
+            theme === 'light' ? '#ffffff' : '#101010'
+        );
 
     try {
         localStorage.setItem('glitch-theme', theme);
@@ -714,19 +717,19 @@ themeBtn.addEventListener('click', () => {
 
 function scrollBottom() {
     chatArea.scrollTo({
-        top:chatArea.scrollHeight,
-        behavior:'smooth'
+        top: chatArea.scrollHeight,
+        behavior: 'smooth'
     });
 }
 
 /* MESSAGE */
 
-function createMessage(text,type='ai') {
+function createMessage(text, type = 'ai') {
     const row = document.createElement('div');
     row.className = 'message';
 
-    if(type === 'user') row.classList.add('user');
-    if(type === 'error') row.classList.add('error');
+    if (type === 'user') row.classList.add('user');
+    if (type === 'error') row.classList.add('error');
 
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
@@ -737,16 +740,17 @@ function createMessage(text,type='ai') {
 
     const name = document.createElement('div');
     name.className = 'message-name';
-    name.textContent = type === 'user' ? 'YOU' :
+    name.textContent =
+        type === 'user' ? 'YOU' :
         type === 'error' ? 'SYSTEM' : 'GLITCH AI';
 
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
     bubble.textContent = text;
 
-    content.append(name,bubble);
+    content.append(name, bubble);
 
-    if(type === 'ai') {
+    if (type === 'ai') {
         const copy = document.createElement('button');
         copy.className = 'copy-btn';
         copy.textContent = '▢ Copy';
@@ -755,7 +759,10 @@ function createMessage(text,type='ai') {
             try {
                 await navigator.clipboard.writeText(text);
                 copy.textContent = '✓ Copied';
-                setTimeout(() => copy.textContent = '▢ Copy',1200);
+
+                setTimeout(() => {
+                    copy.textContent = '▢ Copy';
+                }, 1200);
             } catch {
                 copy.textContent = 'Copy unavailable';
             }
@@ -764,10 +771,10 @@ function createMessage(text,type='ai') {
         content.appendChild(copy);
     }
 
-    if(type === 'user') {
-        row.append(content,avatar);
+    if (type === 'user') {
+        row.append(content, avatar);
     } else {
-        row.append(avatar,content);
+        row.append(avatar, content);
     }
 
     chatBox.appendChild(row);
@@ -799,13 +806,13 @@ function showTyping() {
     const dots = document.createElement('div');
     dots.className = 'typing';
 
-    for(let i=0;i<3;i++) {
+    for (let i = 0; i < 3; i++) {
         dots.appendChild(document.createElement('span'));
     }
 
     bubble.appendChild(dots);
-    content.append(name,bubble);
-    row.append(avatar,content);
+    content.append(name, bubble);
+    row.append(avatar, content);
 
     chatBox.appendChild(row);
     scrollBottom();
@@ -813,30 +820,43 @@ function showTyping() {
     return row;
 }
 
-/* SEND */
+/* SEND MESSAGE */
 
 async function sendMsg() {
     const txt = input.value.trim();
 
-    if(!txt || isSending) return;
+    if (!txt || isSending) return;
 
     isSending = true;
     sendBtn.disabled = true;
 
     document.getElementById('welcome')?.remove();
 
-    createMessage(txt,'user');
+    createMessage(txt, 'user');
 
     input.value = '';
     input.style.height = 'auto';
 
     const loader = showTyping();
 
+    // বর্তমান প্রশ্ন conversation history-তে যোগ
+    const updatedConversation = [
+        ...conversation,
+        {
+            role: 'user',
+            content: txt
+        }
+    ];
+
     try {
-        const res = await fetch(workerUrl,{
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({prompt:txt})
+        const res = await fetch(workerUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                messages: updatedConversation.slice(-20)
+            })
         });
 
         let data;
@@ -847,20 +867,38 @@ async function sendMsg() {
             throw new Error('সার্ভারের response সঠিক JSON নয়।');
         }
 
-        if(!res.ok) {
-            throw new Error(data.error || 'Server Error: '+res.status);
+        if (!res.ok) {
+            throw new Error(
+                data.error || 'Server Error: ' + res.status
+            );
         }
 
-        if(!data.reply) {
-            throw new Error(data.error || 'AI কোনো উত্তর দেয়নি।');
+        if (!data.success || !data.reply) {
+            throw new Error(
+                data.error || 'AI কোনো উত্তর দেয়নি।'
+            );
         }
 
-        loader.remove();
-        createMessage(String(data.reply),'ai');
+        // সফল হলে conversation history সংরক্ষণ
+        conversation = [
+            ...updatedConversation,
+            {
+                role: 'assistant',
+                content: String(data.reply)
+            }
+        ].slice(-20);
 
-    } catch(err) {
         loader.remove();
-        createMessage('সংযোগ সমস্যা: '+err.message,'error');
+        createMessage(String(data.reply), 'ai');
+
+    } catch (err) {
+        loader.remove();
+
+        createMessage(
+            'সংযোগ সমস্যা: ' + err.message,
+            'error'
+        );
+
     } finally {
         isSending = false;
         sendBtn.disabled = false;
@@ -868,73 +906,97 @@ async function sendMsg() {
     }
 }
 
-sendBtn.addEventListener('click',sendMsg);
+sendBtn.addEventListener('click', sendMsg);
 
-input.addEventListener('keydown',e=>{
-    if(e.key==='Enter' && !e.shiftKey) {
+input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
         sendMsg();
     }
 });
 
-input.addEventListener('input',()=>{
-    input.style.height='auto';
-    input.style.height=Math.min(input.scrollHeight,140)+'px';
+input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height =
+        Math.min(input.scrollHeight, 140) + 'px';
 });
 
 /* NEW CHAT */
 
 function newChat() {
-    if(isSending) return;
+    if (isSending) return;
+
+    conversation = [];
 
     chatBox.innerHTML = `
         <div class="welcome" id="welcome">
             <div class="welcome-logo">G</div>
+
             <h1>How can I help you?</h1>
-            <p>তোমার যেকোনো প্রশ্ন, আইডিয়া অথবা কাজ নিয়ে<br>Glitch AI-এর সঙ্গে কথা বলো।</p>
+
+            <p>
+                তোমার যেকোনো প্রশ্ন, আইডিয়া অথবা কাজ নিয়ে<br>
+                Glitch AI-এর সঙ্গে কথা বলো।
+            </p>
+
             <div class="suggestions">
-                <button class="suggestion" data-prompt="আমাকে AI সম্পর্কে শেখাও।">
-                    <strong>✧ Learn AI</strong>
-                    <span>AI শেখার যাত্রা শুরু করো।</span>
+
+                <button class="suggestion"
+                    data-prompt="তোমার পরিচয় দাও।">
+                    <strong>✧ Give Your Identity</strong>
+                    <span>তোমার পরিচয় দাও</span>
                 </button>
-                <button class="suggestion" data-prompt="আমাকে ওয়েব ডেভেলপমেন্ট শেখাও।">
+
+                <button class="suggestion"
+                    data-prompt="আমাকে ওয়েব ডেভেলপমেন্ট শেখাও।">
                     <strong>⌘ Coding</strong>
                     <span>কোডিং ও ওয়েব ডেভেলপমেন্ট।</span>
                 </button>
-                <button class="suggestion" data-prompt="একটি নতুন ব্যবসার আইডিয়া দাও।">
+
+                <button class="suggestion"
+                    data-prompt="একটি নতুন ব্যবসার আইডিয়া দাও।">
                     <strong>◈ Business Ideas</strong>
                     <span>নতুন ব্যবসার পরিকল্পনা।</span>
                 </button>
-                <button class="suggestion" data-prompt="আমাকে একটি কঠিন সমস্যা দাও।">
+
+                <button class="suggestion"
+                    data-prompt="আমাকে একটি কঠিন সমস্যা দাও।">
                     <strong>◎ Challenge</strong>
                     <span>নিজের দক্ষতা যাচাই করো।</span>
                 </button>
+
             </div>
-        </div>`;
+        </div>
+    `;
 
     input.value = '';
     input.focus();
 }
 
-document.getElementById('new-chat').addEventListener('click',newChat);
+document.getElementById('new-chat')
+    .addEventListener('click', newChat);
 
-document.getElementById('about-btn').addEventListener('click',()=>{
-    createMessage(
-        'Glitch AI is your personal AI workspace, built for learning, creativity and intelligent conversations.',
-        'ai'
-    );
-});
+/* ABOUT */
+
+document.getElementById('about-btn')
+    .addEventListener('click', () => {
+        createMessage(
+            'Glitch AI is your personal AI workspace, built for learning, creativity and intelligent conversations.',
+            'ai'
+        );
+    });
 
 /* SUGGESTIONS */
 
-chatBox.addEventListener('click',e=>{
+chatBox.addEventListener('click', e => {
     const btn = e.target.closest('[data-prompt]');
-    if(!btn) return;
+
+    if (!btn) return;
 
     input.value = btn.dataset.prompt;
     sendMsg();
 });
 </script>
-
+    
 </body>
 </html>

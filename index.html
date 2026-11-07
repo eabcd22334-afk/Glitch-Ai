@@ -578,7 +578,7 @@ button {
 
     <aside class="sidebar">
         <div class="brand">
-            <div class="logo">G.</div>
+            <div class="logo">G</div>
             <div>
                 <div class="brand-name">Glitch AI</div>
                 <div class="brand-sub">INTELLIGENCE</div>
@@ -594,7 +594,7 @@ button {
 
         <div class="sidebar-bottom">
             <div class="user-profile">
-                <div class="avatar">Glitch</div>
+                <div class="avatar">G</div>
                 <div>
                     <div class="user-name">Glitch User</div>
                     <div class="user-label">Personal Workspace</div>
@@ -607,7 +607,7 @@ button {
 
         <header class="topbar">
             <div style="display:flex;align-items:center">
-                <span class="mobile-logo"> Glitch </span>
+                <span class="mobile-logo">G. GLITCH</span>
                 <div class="top-title">AI Assistant</div>
             </div>
 
@@ -624,7 +624,7 @@ button {
                     <div class="welcome-logo">G</div>
 
                     <h1>How can I help you?</h1>
-                    <p>তোমার যেকোনো প্রশ্ন, আইডিয়া অথবা কাজ নিয়ে Glitch AI-এর সঙ্গে কথা বলো।</p>
+                    <p>তোমার যেকোনো প্রশ্ন, আইডিয়া অথবা কাজ নিয়ে<br>Glitch AI-এর সঙ্গে কথা বলো।</p>
 
                     <div class="suggestions">
                         <button class="suggestion" data-prompt="আমাকে AI সম্পর্কে শেখাও।">
@@ -663,7 +663,7 @@ button {
                 </div>
 
                 <div class="composer-info">
-                    <span> Glitch AI</span>
+                    <span>Glitch AI</span>
                     <span>Enter to send · Shift + Enter for new line</span>
                 </div>
             </div>
@@ -694,14 +694,14 @@ function applyTheme(theme) {
         .setAttribute('content', theme === 'light' ? '#ffffff' : '#101010');
 
     try {
-        localStorage.setItem('nyx-theme', theme);
+        localStorage.setItem('glitch-theme', theme);
     } catch {}
 }
 
 let savedTheme = 'dark';
 
 try {
-    savedTheme = localStorage.getItem('nyx-theme') || 'dark';
+    savedTheme = localStorage.getItem('glitch-theme') || 'dark';
 } catch {}
 
 applyTheme(savedTheme);
@@ -730,7 +730,7 @@ function createMessage(text,type='ai') {
 
     const avatar = document.createElement('div');
     avatar.className = 'message-avatar';
-    avatar.textContent = type === 'user' ? 'U' : 'N';
+    avatar.textContent = type === 'user' ? 'U' : 'G';
 
     const content = document.createElement('div');
     content.className = 'message-content';
@@ -738,7 +738,7 @@ function createMessage(text,type='ai') {
     const name = document.createElement('div');
     name.className = 'message-name';
     name.textContent = type === 'user' ? 'YOU' :
-        type === 'error' ? 'SYSTEM' : 'Glitch AI';
+        type === 'error' ? 'SYSTEM' : 'GLITCH AI';
 
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
@@ -791,7 +791,7 @@ function showTyping() {
 
     const name = document.createElement('div');
     name.className = 'message-name';
-    name.textContent = 'Glitch AI';
+    name.textContent = 'GLITCH AI';
 
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
@@ -889,9 +889,9 @@ function newChat() {
 
     chatBox.innerHTML = `
         <div class="welcome" id="welcome">
-            <div class="welcome-logo">N</div>
+            <div class="welcome-logo">G</div>
             <h1>How can I help you?</h1>
-            <p>তোমার যেকোনো প্রশ্ন, আইডিয়া অথবা কাজ নিয়ে<br>Nyx AI-এর সঙ্গে কথা বলো।</p>
+            <p>তোমার যেকোনো প্রশ্ন, আইডিয়া অথবা কাজ নিয়ে<br>Glitch AI-এর সঙ্গে কথা বলো।</p>
             <div class="suggestions">
                 <button class="suggestion" data-prompt="আমাকে AI সম্পর্কে শেখাও।">
                     <strong>✧ Learn AI</strong>
@@ -920,7 +920,7 @@ document.getElementById('new-chat').addEventListener('click',newChat);
 
 document.getElementById('about-btn').addEventListener('click',()=>{
     createMessage(
-        'Nyx AI is your personal AI workspace, built for learning, creativity and intelligent conversations.',
+        'Glitch AI is your personal AI workspace, built for learning, creativity and intelligent conversations.',
         'ai'
     );
 });

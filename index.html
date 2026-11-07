@@ -1,0 +1,940 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101010">
+<title>Glitch AI</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    color-scheme: dark;
+    --bg:#101010;
+    --sidebar:#141414;
+    --surface:#191919;
+    --hover:#222222;
+    --text:#ededed;
+    --muted:#888888;
+    --border:#292929;
+    --accent:#a3adff;
+    --user:#282828;
+}
+
+body.light {
+    color-scheme: light;
+    --bg:#ffffff;
+    --sidebar:#f8f8f8;
+    --surface:#f5f5f5;
+    --hover:#ebebeb;
+    --text:#202020;
+    --muted:#858585;
+    --border:#e8e8e8;
+    --accent:#5368d8;
+    --user:#f0f0f0;
+}
+
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body {
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,'Hind Siliguri',sans-serif;
+    height:100dvh;
+    overflow:hidden;
+    transition:background .2s,color .2s;
+}
+
+button,textarea {
+    font:inherit;
+}
+
+button {
+    cursor:pointer;
+}
+
+.app {
+    display:flex;
+    height:100dvh;
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    width:245px;
+    flex-shrink:0;
+    background:var(--sidebar);
+    border-right:1px solid var(--border);
+    padding:22px 16px;
+    display:flex;
+    flex-direction:column;
+}
+
+.brand {
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:5px 8px;
+    margin-bottom:32px;
+}
+
+.logo {
+    width:34px;
+    height:34px;
+    background:var(--text);
+    color:var(--bg);
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    font-size:17px;
+    font-weight:800;
+}
+
+.brand-name {
+    font-weight:700;
+    font-size:17px;
+    letter-spacing:-.5px;
+}
+
+.brand-sub {
+    color:var(--muted);
+    font-size:9px;
+    margin-top:3px;
+    letter-spacing:1px;
+}
+
+.new-chat {
+    width:100%;
+    padding:12px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text);
+    border-radius:9px;
+    text-align:left;
+    font-size:12px;
+    margin-bottom:27px;
+}
+
+.new-chat:hover,.nav-btn:hover {
+    background:var(--hover);
+}
+
+.section-label {
+    color:var(--muted);
+    font-size:10px;
+    letter-spacing:1px;
+    padding:0 9px;
+    margin-bottom:10px;
+}
+
+.nav-btn {
+    width:100%;
+    background:transparent;
+    border:0;
+    color:var(--muted);
+    text-align:left;
+    padding:11px 10px;
+    border-radius:8px;
+    font-size:12px;
+    margin-bottom:3px;
+}
+
+.nav-btn.active {
+    color:var(--text);
+    background:var(--hover);
+}
+
+.sidebar-bottom {
+    margin-top:auto;
+    border-top:1px solid var(--border);
+    padding-top:15px;
+}
+
+.user-profile {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px;
+}
+
+.avatar {
+    width:32px;
+    height:32px;
+    display:grid;
+    place-items:center;
+    border-radius:50%;
+    background:var(--hover);
+    font-weight:700;
+    font-size:12px;
+}
+
+.user-name {
+    font-size:12px;
+    font-weight:600;
+}
+
+.user-label {
+    color:var(--muted);
+    font-size:10px;
+    margin-top:3px;
+}
+
+/* MAIN */
+
+.main {
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+}
+
+.topbar {
+    height:62px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 30px;
+    border-bottom:1px solid var(--border);
+}
+
+.top-title {
+    font-size:13px;
+    font-weight:600;
+}
+
+.top-right {
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.online {
+    font-size:10px;
+    color:var(--muted);
+}
+
+.theme-btn {
+    width:36px;
+    height:36px;
+    background:transparent;
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:9px;
+    font-size:16px;
+}
+
+.theme-btn:hover {
+    background:var(--hover);
+}
+
+.mobile-logo {
+    display:none;
+}
+
+/* CHAT */
+
+.chat-area {
+    flex:1;
+    overflow-y:auto;
+    padding:30px 25px;
+}
+
+.chat-inner {
+    width:100%;
+    max-width:760px;
+    margin:auto;
+    min-height:100%;
+}
+
+.welcome {
+    min-height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+    padding:35px 0;
+}
+
+.welcome-logo {
+    width:49px;
+    height:49px;
+    border-radius:15px;
+    background:var(--text);
+    color:var(--bg);
+    display:grid;
+    place-items:center;
+    font-size:24px;
+    font-weight:800;
+    margin-bottom:24px;
+}
+
+.welcome h1 {
+    font-size:clamp(25px,4vw,34px);
+    letter-spacing:-1.2px;
+    font-weight:600;
+}
+
+.welcome p {
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.8;
+    margin-top:12px;
+}
+
+.suggestions {
+    width:100%;
+    max-width:570px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:35px;
+}
+
+.suggestion {
+    text-align:left;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:10px;
+    padding:15px;
+    transition:.2s;
+}
+
+.suggestion:hover {
+    background:var(--hover);
+}
+
+.suggestion strong {
+    font-size:12px;
+    font-weight:600;
+    display:block;
+    margin-bottom:6px;
+}
+
+.suggestion span {
+    font-size:11px;
+    color:var(--muted);
+    line-height:1.5;
+}
+
+/* MESSAGE */
+
+.message {
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    margin:25px 0;
+    animation:show .2s ease;
+}
+
+.message.user {
+    justify-content:flex-end;
+}
+
+.message-content {
+    max-width:80%;
+    min-width:0;
+}
+
+.message.user .message-content {
+    display:flex;
+    align-items:flex-end;
+    flex-direction:column;
+}
+
+.message-name {
+    font-size:10px;
+    color:var(--muted);
+    margin-bottom:7px;
+}
+
+.bubble {
+    background:var(--surface);
+    padding:12px 16px;
+    border-radius:5px 13px 13px 13px;
+    font-size:13px;
+    line-height:1.85;
+    white-space:pre-wrap;
+    overflow-wrap:anywhere;
+}
+
+.message.user .bubble {
+    background:var(--user);
+    border-radius:13px 5px 13px 13px;
+}
+
+.message.error .bubble {
+    color:#d97777;
+}
+
+.message-avatar {
+    width:29px;
+    height:29px;
+    flex-shrink:0;
+    display:grid;
+    place-items:center;
+    border-radius:9px;
+    background:var(--surface);
+    font-weight:700;
+    font-size:11px;
+}
+
+.copy-btn {
+    background:none;
+    border:0;
+    color:var(--muted);
+    font-size:10px;
+    padding:8px 0;
+}
+
+.copy-btn:hover {
+    color:var(--text);
+}
+
+.typing {
+    display:flex;
+    gap:5px;
+    padding:7px 0;
+}
+
+.typing span {
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:var(--muted);
+    animation:blink .7s infinite alternate;
+}
+
+.typing span:nth-child(2) {animation-delay:.2s}
+.typing span:nth-child(3) {animation-delay:.4s}
+
+/* INPUT */
+
+.composer-wrap {
+    flex-shrink:0;
+    padding:12px 25px 20px;
+}
+
+.composer-inner {
+    max-width:760px;
+    margin:auto;
+}
+
+.composer {
+    display:flex;
+    align-items:flex-end;
+    gap:10px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    padding:12px 12px 12px 17px;
+    background:var(--surface);
+    transition:border .2s;
+}
+
+.composer:focus-within {
+    border-color:var(--muted);
+}
+
+#user-input {
+    flex:1;
+    min-width:0;
+    background:transparent;
+    color:var(--text);
+    border:0;
+    outline:0;
+    resize:none;
+    font-family:inherit;
+    font-size:13px;
+    line-height:1.7;
+    max-height:140px;
+}
+
+#user-input::placeholder {
+    color:var(--muted);
+}
+
+.send-btn {
+    width:35px;
+    height:35px;
+    flex-shrink:0;
+    border:0;
+    border-radius:9px;
+    background:var(--text);
+    color:var(--bg);
+    font-size:17px;
+}
+
+.send-btn:disabled {
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+.composer-info {
+    display:flex;
+    justify-content:space-between;
+    padding:9px 3px 0;
+    font-size:10px;
+    color:var(--muted);
+}
+
+.chat-area::-webkit-scrollbar {
+    width:4px;
+}
+
+.chat-area::-webkit-scrollbar-thumb {
+    background:var(--border);
+    border-radius:10px;
+}
+
+@keyframes show {
+    from {opacity:0;transform:translateY(5px)}
+    to {opacity:1;transform:translateY(0)}
+}
+
+@keyframes blink {
+    to {opacity:.25;transform:translateY(-3px)}
+}
+
+/* MOBILE */
+
+@media(max-width:700px) {
+    .sidebar {
+        display:none;
+    }
+
+    .topbar {
+        height:58px;
+        padding:0 15px;
+    }
+
+    .mobile-logo {
+        display:block;
+        font-weight:700;
+        font-size:15px;
+        margin-right:12px;
+    }
+
+    .top-title {
+        font-size:12px;
+    }
+
+    .chat-area {
+        padding:20px 14px;
+    }
+
+    .welcome h1 {
+        font-size:27px;
+    }
+
+    .welcome p {
+        font-size:12px;
+    }
+
+    .suggestions {
+        grid-template-columns:1fr;
+        margin-top:25px;
+    }
+
+    .suggestion {
+        padding:13px;
+    }
+
+    .message-content {
+        max-width:86%;
+    }
+
+    .bubble {
+        font-size:12px;
+    }
+
+    .composer-wrap {
+        padding:10px 12px 13px;
+    }
+
+    .composer-info {
+        font-size:9px;
+    }
+}
+
+@media(max-width:360px) {
+    .composer-info span:last-child {
+        display:none;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo">G.</div>
+            <div>
+                <div class="brand-name">Glitch AI</div>
+                <div class="brand-sub">INTELLIGENCE</div>
+            </div>
+        </div>
+
+        <button class="new-chat" id="new-chat">＋ &nbsp; New Chat</button>
+
+        <div class="section-label">WORKSPACE</div>
+
+        <button class="nav-btn active">◈ &nbsp; AI Assistant</button>
+        <button class="nav-btn" id="about-btn">ⓘ &nbsp; About Glitch AI</button>
+
+        <div class="sidebar-bottom">
+            <div class="user-profile">
+                <div class="avatar">Glitch</div>
+                <div>
+                    <div class="user-name">Glitch User</div>
+                    <div class="user-label">Personal Workspace</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <div style="display:flex;align-items:center">
+                <span class="mobile-logo"> Glitch </span>
+                <div class="top-title">AI Assistant</div>
+            </div>
+
+            <div class="top-right">
+                <span class="online">● Online</span>
+                <button class="theme-btn" id="theme-toggle" title="Change theme">☀</button>
+            </div>
+        </header>
+
+        <section class="chat-area" id="chat-area">
+            <div class="chat-inner" id="chat-box">
+
+                <div class="welcome" id="welcome">
+                    <div class="welcome-logo">G</div>
+
+                    <h1>How can I help you?</h1>
+                    <p>তোমার যেকোনো প্রশ্ন, আইডিয়া অথবা কাজ নিয়ে Glitch AI-এর সঙ্গে কথা বলো।</p>
+
+                    <div class="suggestions">
+                        <button class="suggestion" data-prompt="আমাকে AI সম্পর্কে শেখাও।">
+                            <strong>✧ Learn AI</strong>
+                            <span>AI শেখার যাত্রা শুরু করো।</span>
+                        </button>
+
+                        <button class="suggestion" data-prompt="আমাকে ওয়েব ডেভেলপমেন্ট শেখাও।">
+                            <strong>⌘ Coding</strong>
+                            <span>কোডিং ও ওয়েব ডেভেলপমেন্ট।</span>
+                        </button>
+
+                        <button class="suggestion" data-prompt="একটি নতুন ব্যবসার আইডিয়া দাও।">
+                            <strong>◈ Business Ideas</strong>
+                            <span>নতুন ব্যবসার পরিকল্পনা।</span>
+                        </button>
+
+                        <button class="suggestion" data-prompt="আমাকে একটি কঠিন সমস্যা দাও।">
+                            <strong>◎ Challenge</strong>
+                            <span>নিজের দক্ষতা যাচাই করো।</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <footer class="composer-wrap">
+            <div class="composer-inner">
+                <div class="composer">
+                    <textarea id="user-input" rows="1"
+                        placeholder="Message Glitch AI..."
+                        aria-label="Message Glitch AI"></textarea>
+
+                    <button class="send-btn" id="send-btn" title="Send">↑</button>
+                </div>
+
+                <div class="composer-info">
+                    <span> Glitch AI</span>
+                    <span>Enter to send · Shift + Enter for new line</span>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+</div>
+
+<script>
+const workerUrl = 'https://nyx-ai-core.eabcd22334.workers.dev';
+
+const body = document.body;
+const chatBox = document.getElementById('chat-box');
+const chatArea = document.getElementById('chat-area');
+const input = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
+const themeBtn = document.getElementById('theme-toggle');
+
+let isSending = false;
+
+/* THEME */
+
+function applyTheme(theme) {
+    body.classList.toggle('light', theme === 'light');
+    themeBtn.textContent = theme === 'light' ? '☾' : '☀';
+
+    document.querySelector('meta[name="theme-color"]')
+        .setAttribute('content', theme === 'light' ? '#ffffff' : '#101010');
+
+    try {
+        localStorage.setItem('nyx-theme', theme);
+    } catch {}
+}
+
+let savedTheme = 'dark';
+
+try {
+    savedTheme = localStorage.getItem('nyx-theme') || 'dark';
+} catch {}
+
+applyTheme(savedTheme);
+
+themeBtn.addEventListener('click', () => {
+    applyTheme(body.classList.contains('light') ? 'dark' : 'light');
+});
+
+/* SCROLL */
+
+function scrollBottom() {
+    chatArea.scrollTo({
+        top:chatArea.scrollHeight,
+        behavior:'smooth'
+    });
+}
+
+/* MESSAGE */
+
+function createMessage(text,type='ai') {
+    const row = document.createElement('div');
+    row.className = 'message';
+
+    if(type === 'user') row.classList.add('user');
+    if(type === 'error') row.classList.add('error');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = type === 'user' ? 'U' : 'N';
+
+    const content = document.createElement('div');
+    content.className = 'message-content';
+
+    const name = document.createElement('div');
+    name.className = 'message-name';
+    name.textContent = type === 'user' ? 'YOU' :
+        type === 'error' ? 'SYSTEM' : 'Glitch AI';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = text;
+
+    content.append(name,bubble);
+
+    if(type === 'ai') {
+        const copy = document.createElement('button');
+        copy.className = 'copy-btn';
+        copy.textContent = '▢ Copy';
+
+        copy.onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(text);
+                copy.textContent = '✓ Copied';
+                setTimeout(() => copy.textContent = '▢ Copy',1200);
+            } catch {
+                copy.textContent = 'Copy unavailable';
+            }
+        };
+
+        content.appendChild(copy);
+    }
+
+    if(type === 'user') {
+        row.append(content,avatar);
+    } else {
+        row.append(avatar,content);
+    }
+
+    chatBox.appendChild(row);
+    scrollBottom();
+
+    return row;
+}
+
+/* TYPING */
+
+function showTyping() {
+    const row = document.createElement('div');
+    row.className = 'message';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = 'G';
+
+    const content = document.createElement('div');
+    content.className = 'message-content';
+
+    const name = document.createElement('div');
+    name.className = 'message-name';
+    name.textContent = 'Glitch AI';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+
+    const dots = document.createElement('div');
+    dots.className = 'typing';
+
+    for(let i=0;i<3;i++) {
+        dots.appendChild(document.createElement('span'));
+    }
+
+    bubble.appendChild(dots);
+    content.append(name,bubble);
+    row.append(avatar,content);
+
+    chatBox.appendChild(row);
+    scrollBottom();
+
+    return row;
+}
+
+/* SEND */
+
+async function sendMsg() {
+    const txt = input.value.trim();
+
+    if(!txt || isSending) return;
+
+    isSending = true;
+    sendBtn.disabled = true;
+
+    document.getElementById('welcome')?.remove();
+
+    createMessage(txt,'user');
+
+    input.value = '';
+    input.style.height = 'auto';
+
+    const loader = showTyping();
+
+    try {
+        const res = await fetch(workerUrl,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({prompt:txt})
+        });
+
+        let data;
+
+        try {
+            data = await res.json();
+        } catch {
+            throw new Error('সার্ভারের response সঠিক JSON নয়।');
+        }
+
+        if(!res.ok) {
+            throw new Error(data.error || 'Server Error: '+res.status);
+        }
+
+        if(!data.reply) {
+            throw new Error(data.error || 'AI কোনো উত্তর দেয়নি।');
+        }
+
+        loader.remove();
+        createMessage(String(data.reply),'ai');
+
+    } catch(err) {
+        loader.remove();
+        createMessage('সংযোগ সমস্যা: '+err.message,'error');
+    } finally {
+        isSending = false;
+        sendBtn.disabled = false;
+        input.focus();
+    }
+}
+
+sendBtn.addEventListener('click',sendMsg);
+
+input.addEventListener('keydown',e=>{
+    if(e.key==='Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMsg();
+    }
+});
+
+input.addEventListener('input',()=>{
+    input.style.height='auto';
+    input.style.height=Math.min(input.scrollHeight,140)+'px';
+});
+
+/* NEW CHAT */
+
+function newChat() {
+    if(isSending) return;
+
+    chatBox.innerHTML = `
+        <div class="welcome" id="welcome">
+            <div class="welcome-logo">N</div>
+            <h1>How can I help you?</h1>
+            <p>তোমার যেকোনো প্রশ্ন, আইডিয়া অথবা কাজ নিয়ে<br>Nyx AI-এর সঙ্গে কথা বলো।</p>
+            <div class="suggestions">
+                <button class="suggestion" data-prompt="আমাকে AI সম্পর্কে শেখাও।">
+                    <strong>✧ Learn AI</strong>
+                    <span>AI শেখার যাত্রা শুরু করো।</span>
+                </button>
+                <button class="suggestion" data-prompt="আমাকে ওয়েব ডেভেলপমেন্ট শেখাও।">
+                    <strong>⌘ Coding</strong>
+                    <span>কোডিং ও ওয়েব ডেভেলপমেন্ট।</span>
+                </button>
+                <button class="suggestion" data-prompt="একটি নতুন ব্যবসার আইডিয়া দাও।">
+                    <strong>◈ Business Ideas</strong>
+                    <span>নতুন ব্যবসার পরিকল্পনা।</span>
+                </button>
+                <button class="suggestion" data-prompt="আমাকে একটি কঠিন সমস্যা দাও।">
+                    <strong>◎ Challenge</strong>
+                    <span>নিজের দক্ষতা যাচাই করো।</span>
+                </button>
+            </div>
+        </div>`;
+
+    input.value = '';
+    input.focus();
+}
+
+document.getElementById('new-chat').addEventListener('click',newChat);
+
+document.getElementById('about-btn').addEventListener('click',()=>{
+    createMessage(
+        'Nyx AI is your personal AI workspace, built for learning, creativity and intelligent conversations.',
+        'ai'
+    );
+});
+
+/* SUGGESTIONS */
+
+chatBox.addEventListener('click',e=>{
+    const btn = e.target.closest('[data-prompt]');
+    if(!btn) return;
+
+    input.value = btn.dataset.prompt;
+    sendMsg();
+});
+</script>
+
+</body>
+</html>
